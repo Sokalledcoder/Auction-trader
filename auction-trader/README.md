@@ -36,60 +36,81 @@ Auction Trader uses Value Area analysis and order flow to identify high-probabil
 └──────────────────────────────────────────────────────────────────┘
 ```
 
+## Current Status
+
+**Phase:** Implementation Complete - Testing in Progress
+**Session:** 3
+**Latest:** Dashboard with Terminal Noir aesthetic, 66 Python tests passing
+
+### What Works Now
+- ✅ Python package with signal engine, position manager, orchestrator
+- ✅ Rust core crates (ingestion, features, backtest) - code complete
+- ✅ Web dashboard with real-time updates (mock data)
+- ✅ 66 Python unit tests (100% passing)
+- ⏳ Rust unit tests (next priority)
+- ⏳ Integration with live Bybit data (ready, untested)
+
+See [HANDOFF.md](HANDOFF.md) for detailed session history and next steps.
+
 ## Quick Start
 
 ### Prerequisites
 
 - Python 3.10+
-- Rust 1.70+ (for building the native extension)
-- Bybit API credentials (for live/paper trading)
+- Rust 1.70+ (for building PyO3 bindings)
+- Git
 
 ### Installation
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/user/auction-trader.git
+git clone https://github.com/Sokalledcoder/Auction-trader.git
 cd auction-trader
 ```
 
-2. Create a virtual environment:
+2. Create and activate virtual environment:
 ```bash
 python -m venv .venv
 source .venv/bin/activate  # Linux/Mac
-# or
-.venv\Scripts\activate  # Windows
+# .venv\Scripts\activate  # Windows
 ```
 
-3. Install with maturin (builds Rust extension):
+3. Install dependencies:
 ```bash
-pip install maturin
-maturin develop
+pip install -e .
 ```
 
-4. Copy and configure environment:
+### Running the Dashboard
+
 ```bash
-cp config/.env.example .env
-# Edit .env with your Bybit API credentials
+# Start the web dashboard
+auction-trader dashboard
+
+# Or run directly
+cd dashboard && uvicorn api:app --reload
 ```
 
-### Running
+Visit http://127.0.0.1:8000 to see the Terminal Noir themed dashboard.
 
-**Paper Trading** (simulated with real data):
+### Running Tests
+
 ```bash
-auction-trader run --mode paper
+# All Python tests
+pytest tests/ -v
+
+# With coverage
+pytest tests/ --cov=auction_trader
+
+# Specific test file
+pytest tests/test_signal_engine.py -v
 ```
 
-**Live Trading** (real money - use with caution!):
-```bash
-export BYBIT_API_KEY=your_key
-export BYBIT_API_SECRET=your_secret
-export BYBIT_TESTNET=false
-auction-trader run --mode live --confirm-live
-```
+### Building Rust Components
 
-**Shadow Mode** (track signals without executing):
 ```bash
-auction-trader run --mode shadow
+cd rust/auction-trader-core
+cargo build --release
+cargo test  # After Rust tests are written
 ```
 
 ### Configuration
@@ -120,28 +141,50 @@ sizing:
 
 ```
 auction-trader/
-├── config/
-│   ├── default.yaml      # Default configuration
-│   └── .env.example      # Environment template
+├── README.md              # This file
+├── HANDOFF.md             # Detailed session history and next steps
+├── pyproject.toml         # Python dependencies
+├── .gitignore
+│
+├── dashboard/             # Web interface
+│   ├── api.py            # FastAPI backend with WebSocket
+│   └── static/
+│       ├── index.html    # Dashboard UI (Terminal Noir theme)
+│       ├── style.css     # Custom styling
+│       └── app.js        # Chart.js + real-time updates
+│
 ├── python/
 │   └── auction_trader/
-│       ├── models/       # Data types
-│       ├── services/     # Core services
-│       ├── storage/      # Database layer
-│       ├── orchestrator.py
-│       └── cli.py
+│       ├── cli.py             # Command-line interface
+│       ├── config.py          # Configuration management
+│       ├── models/
+│       │   └── types.py       # Core data models
+│       └── services/
+│           ├── collector.py       # WebSocket data collection
+│           ├── signal_engine.py   # Signal generation
+│           ├── position_manager.py # Risk and position management
+│           └── orchestrator.py    # System coordination
+│
 ├── rust/
 │   └── auction-trader-core/
 │       └── crates/
-│           ├── core/      # Shared types
-│           ├── ingestion/ # Trade classification
-│           ├── features/  # VA, OF computation
-│           ├── backtest/  # Simulation engine
-│           └── pyo3_bindings/  # Python bindings
-├── data/                  # Database files (gitignored)
-├── logs/                  # Log files (gitignored)
-└── pyproject.toml
+│           ├── core/         # Shared types and config
+│           ├── ingestion/    # Trade/quote normalization
+│           ├── features/     # VA and order flow computation
+│           └── backtest/     # Simulation engine
+│
+└── tests/                 # Python test suite (66 tests)
+    ├── conftest.py       # Pytest fixtures
+    ├── test_types.py
+    ├── test_config.py
+    ├── test_signal_engine.py
+    └── test_position_manager.py
 ```
+
+**Key Documentation:**
+- `/home/soka/Desktop/exp1/specv2.md` - Full technical specification
+- `/home/soka/Desktop/exp1/claude.md` - Claude onboarding guide
+- `/home/soka/Desktop/exp1/PROJECT_INTENT.md` - Design decisions Q&A
 
 ## Trading Logic
 
