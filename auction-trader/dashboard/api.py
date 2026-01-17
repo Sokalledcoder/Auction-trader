@@ -7,14 +7,14 @@ Serves:
 """
 
 import asyncio
-import json
 import logging
+import random
+import statistics
 from datetime import datetime
 from pathlib import Path
-from typing import Optional, List, Dict, Any
-import random
+from typing import Optional, List, Dict
 
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse, FileResponse
 from fastapi.middleware.cors import CORSMiddleware
@@ -164,6 +164,18 @@ class MockDataGenerator:
 
         self.base_price = price
 
+    def _calculate_stats(self) -> Stats:
+        """Calculate current trading statistics."""
+        win_rate = self.wins / self.trades_count if self.trades_count > 0 else 0
+        max_dd = abs(min(0, self.total_pnl)) / 10000
+        return Stats(
+            total_trades=self.trades_count,
+            win_rate=win_rate,
+            total_pnl=self.total_pnl,
+            max_drawdown=max_dd,
+            avg_hold_minutes=random.uniform(5, 30),
+        )
+
     def generate_tick(self) -> DashboardState:
         """Generate a new tick of data."""
         ts = int(datetime.now().timestamp() * 1000)
@@ -183,8 +195,8 @@ class MockDataGenerator:
 
         # Calculate VA from recent prices
         recent = [p["price"] for p in self.price_history[-240:]]
-        poc = sum(recent) / len(recent)
-        std = (sum((p - poc) ** 2 for p in recent) / len(recent)) ** 0.5
+        poc = statistics.mean(recent)
+        std = statistics.stdev(recent) if len(recent) > 1 else 0
         va = ValueArea(
             poc=poc,
             vah=poc + std * 0.67,
@@ -258,15 +270,6 @@ class MockDataGenerator:
                 tp2_price=self.position["tp2_price"],
             )
 
-        # Stats
-        stats = Stats(
-            total_trades=self.trades_count,
-            win_rate=self.wins / self.trades_count if self.trades_count > 0 else 0,
-            total_pnl=self.total_pnl,
-            max_drawdown=abs(min(0, self.total_pnl)) / 10000,
-            avg_hold_minutes=random.uniform(5, 30),
-        )
-
         return DashboardState(
             timestamp=ts,
             price=price,
@@ -274,7 +277,7 @@ class MockDataGenerator:
             order_flow=order_flow,
             position=position,
             recent_signals=self.signals[-10:],
-            stats=stats,
+            stats=self._calculate_stats(),
             price_history=self.price_history[-120:],
         )
 
@@ -316,11 +319,7 @@ async def get_signals(limit: int = 50):
 @app.get("/api/stats")
 async def get_stats():
     """Get trading statistics."""
-    return {
-        "total_trades": mock_generator.trades_count,
-        "win_rate": mock_generator.wins / mock_generator.trades_count if mock_generator.trades_count > 0 else 0,
-        "total_pnl": mock_generator.total_pnl,
-    }
+    return mock_generator._calculate_stats()
 
 
 @app.websocket("/ws")

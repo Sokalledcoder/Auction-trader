@@ -198,24 +198,16 @@ function updateChart(priceHistory, va) {
         ? [priceHistory[0].ts, priceHistory[priceHistory.length - 1].ts]
         : [Date.now() - 60000, Date.now()];
 
-    const vahData = [
-        { x: timeRange[0], y: va.vah },
-        { x: timeRange[1], y: va.vah },
-    ];
-    const pocData = [
-        { x: timeRange[0], y: va.poc },
-        { x: timeRange[1], y: va.poc },
-    ];
-    const valData = [
-        { x: timeRange[0], y: va.val },
-        { x: timeRange[1], y: va.val },
+    const createVALine = (value) => [
+        { x: timeRange[0], y: value },
+        { x: timeRange[1], y: value },
     ];
 
     // Update datasets
     chart.data.datasets[0].data = priceData;
-    chart.data.datasets[1].data = vahData;
-    chart.data.datasets[2].data = pocData;
-    chart.data.datasets[3].data = valData;
+    chart.data.datasets[1].data = createVALine(va.vah);
+    chart.data.datasets[2].data = createVALine(va.poc);
+    chart.data.datasets[3].data = createVALine(va.val);
 
     chart.update('none');
 }
