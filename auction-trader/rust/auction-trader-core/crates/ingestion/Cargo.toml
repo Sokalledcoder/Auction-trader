@@ -1,0 +1,16 @@
+[package]
+name = "auction-ingestion"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+auction-core.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+chrono.workspace = true
+ordered-float.workspace = true
+tracing.workspace = true
+
+[dev-dependencies]
+approx.workspace = true

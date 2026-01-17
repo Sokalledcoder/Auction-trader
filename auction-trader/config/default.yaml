@@ -1,0 +1,76 @@
+# Auction Trader - Default Configuration
+# See specv2.md for detailed parameter documentation
+
+instrument:
+  symbol: BTCUSDT
+  exchange: bybit
+  timeframe: 1m
+  tick_size: 0.1
+  rolling_window_minutes: 240
+
+value_area:
+  va_fraction: 0.70
+  base_bin_ticks: 1
+  alpha_bin: 0.25
+  bin_width_max_ticks: 200
+  rebucket_interval_minutes: 15
+  rebucket_change_pct: 0.25
+  min_va_bins: 20
+
+order_flow:
+  max_quote_staleness_ms: 250
+  ambiguous_trade_frac_max: 0.35
+  use_tick_rule_fallback: true
+  use_qimb: true
+  qimb_entry_min: 0.10
+  qimb_breakout_min: 0.10
+  qimb_fail_max: -0.10
+  spread_lookback_minutes: 60
+
+signal:
+  # Order flow thresholds (either/or logic)
+  of_entry_min: 0.0
+  of_entry_min_norm: 0.1
+  of_breakout_min: 0.0
+  of_breakout_min_norm: 0.1
+  of_fail_max: 0.0
+  of_fail_max_norm: -0.1
+  # Acceptance
+  accept_outside_k: 3
+  # Modes
+  enable_retest_mode: true
+  enable_flip_on_signal: true
+
+sizing:
+  risk_pct: 0.02
+  max_leverage: 10.0
+  tp1_pct: 0.30
+  tp2_pct: 0.70
+  move_stop_to_breakeven_after_tp1: true
+
+risk:
+  max_hold_minutes: 60
+  extend_if_profitable: true
+  cooldown_minutes: 3
+  stop_buffer_ticks: 2
+  max_daily_loss: null  # Set to a value like 500.0 to enable
+
+execution:
+  use_limit_for_entry: true
+  limit_order_timeout_minutes: 1
+  slippage_ticks_entry: 1
+  slippage_ticks_exit: 1
+  taker_fee_bps: 5.0
+  maker_fee_bps: -1.0
+
+backtest:
+  funding_rate_8h_bps: 1.0
+  initial_capital: 10000.0
+  workers: 0  # 0 = auto (CPU cores / 2)
+
+database:
+  data_dir: ./data
+  raw_db: raw.duckdb
+  features_db: features.duckdb
+  signals_db: signals.db
+  execution_db: execution.db

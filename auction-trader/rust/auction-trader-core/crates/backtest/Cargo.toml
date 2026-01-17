@@ -1,0 +1,21 @@
+[package]
+name = "auction-backtest"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+auction-core.workspace = true
+auction-ingestion.workspace = true
+auction-features.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+anyhow.workspace = true
+chrono.workspace = true
+ordered-float.workspace = true
+tracing.workspace = true
+duckdb.workspace = true
+rusqlite.workspace = true
+
+[dev-dependencies]
+approx.workspace = true

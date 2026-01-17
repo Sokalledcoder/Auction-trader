@@ -1,0 +1,79 @@
+[build-system]
+requires = ["maturin>=1.4,<2.0"]
+build-backend = "maturin"
+
+[project]
+name = "auction-trader"
+version = "0.1.0"
+description = "BTC Perpetual Trading System using Auction Market Theory"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [
+    { name = "auction-trader" }
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Financial and Insurance Industry",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Rust",
+]
+dependencies = [
+    "pyyaml>=6.0",
+    "websockets>=12.0",
+    "aiohttp>=3.9",
+    "duckdb>=0.10",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "pytest-asyncio>=0.23",
+    "pytest-cov>=4.0",
+    "black>=24.0",
+    "ruff>=0.2",
+    "mypy>=1.8",
+]
+dashboard = [
+    "fastapi>=0.109",
+    "uvicorn>=0.27",
+    "jinja2>=3.1",
+]
+
+[project.scripts]
+auction-trader = "auction_trader.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/user/auction-trader"
+Repository = "https://github.com/user/auction-trader"
+
+[tool.maturin]
+# Build the Rust extension
+manifest-path = "rust/auction-trader-core/crates/pyo3_bindings/Cargo.toml"
+python-source = "python"
+module-name = "auction_trader.auction_trader_core"
+features = ["pyo3/extension-module"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+addopts = "-v --tb=short"
+
+[tool.black]
+line-length = 88
+target-version = ["py310", "py311", "py312"]
+
+[tool.ruff]
+line-length = 88
+select = ["E", "F", "I", "N", "W", "UP"]
+ignore = ["E501"]
+
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = true
+warn_unused_ignores = true
+disallow_untyped_defs = true

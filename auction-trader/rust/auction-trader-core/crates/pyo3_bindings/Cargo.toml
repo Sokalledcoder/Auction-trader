@@ -1,0 +1,18 @@
+[package]
+name = "auction-pyo3"
+version.workspace = true
+edition.workspace = true
+description = "PyO3 bindings for auction-trader Rust components"
+
+[lib]
+name = "auction_trader_core"
+crate-type = ["cdylib"]
+
+[dependencies]
+pyo3.workspace = true
+
+# Internal crates
+auction-core = { path = "../core" }
+auction-ingestion = { path = "../ingestion" }
+auction-features = { path = "../features" }
+auction-backtest = { path = "../backtest" }

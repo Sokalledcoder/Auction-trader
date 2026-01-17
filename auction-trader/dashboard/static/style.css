@@ -1,0 +1,877 @@
+/* ============================================================================
+   AUCTION TRADER DASHBOARD - TERMINAL NOIR
+   A cyberpunk-inspired trading terminal with CRT aesthetics
+   ============================================================================ */
+
+:root {
+    /* Core palette */
+    --bg-deep: #0a0a0f;
+    --bg-panel: #0f1016;
+    --bg-elevated: #161822;
+    --bg-hover: #1c1f2e;
+
+    /* Borders & lines */
+    --border-dim: rgba(255, 255, 255, 0.06);
+    --border-subtle: rgba(255, 255, 255, 0.1);
+    --border-accent: rgba(0, 255, 213, 0.3);
+
+    /* Text hierarchy */
+    --text-primary: #e8e8ec;
+    --text-secondary: #8a8a9a;
+    --text-muted: #4a4a5a;
+    --text-dim: #2a2a3a;
+
+    /* Accent colors */
+    --accent-cyan: #00ffd5;
+    --accent-cyan-dim: rgba(0, 255, 213, 0.15);
+    --accent-magenta: #ff3d7f;
+    --accent-magenta-dim: rgba(255, 61, 127, 0.15);
+    --accent-gold: #ffd700;
+    --accent-gold-dim: rgba(255, 215, 0, 0.15);
+
+    /* Trading colors */
+    --long: #00ffd5;
+    --long-bg: rgba(0, 255, 213, 0.1);
+    --short: #ff3d7f;
+    --short-bg: rgba(255, 61, 127, 0.1);
+    --profit: #00ffd5;
+    --loss: #ff3d7f;
+
+    /* Value Area */
+    --va-vah: #ff9f43;
+    --va-poc: #ffd700;
+    --va-val: #54a0ff;
+
+    /* Spacing */
+    --gap-xs: 4px;
+    --gap-sm: 8px;
+    --gap-md: 16px;
+    --gap-lg: 24px;
+    --gap-xl: 32px;
+
+    /* Typography */
+    --font-mono: 'JetBrains Mono', monospace;
+    --font-display: 'Orbitron', sans-serif;
+
+    /* Effects */
+    --glow-cyan: 0 0 20px rgba(0, 255, 213, 0.4);
+    --glow-magenta: 0 0 20px rgba(255, 61, 127, 0.4);
+
+    /* Panel */
+    --panel-radius: 2px;
+    --panel-blur: 12px;
+}
+
+/* ============================================================================
+   RESET & BASE
+   ============================================================================ */
+
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    font-size: 14px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+    font-family: var(--font-mono);
+    background: var(--bg-deep);
+    color: var(--text-primary);
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+}
+
+/* ============================================================================
+   BACKGROUND EFFECTS
+   ============================================================================ */
+
+/* CRT Scanlines */
+.scanlines {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1000;
+    background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0, 0, 0, 0.1) 2px,
+        rgba(0, 0, 0, 0.1) 4px
+    );
+    opacity: 0.3;
+}
+
+/* Noise texture */
+.noise {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 999;
+    opacity: 0.03;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+}
+
+/* ============================================================================
+   CONTAINER
+   ============================================================================ */
+
+.terminal-container {
+    max-width: 1800px;
+    margin: 0 auto;
+    padding: var(--gap-md);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* ============================================================================
+   HEADER
+   ============================================================================ */
+
+.terminal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--gap-md) var(--gap-lg);
+    background: var(--bg-panel);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--panel-radius);
+    margin-bottom: var(--gap-md);
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: var(--gap-lg);
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: var(--gap-sm);
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.2rem;
+    letter-spacing: 0.15em;
+}
+
+.logo-icon {
+    color: var(--accent-cyan);
+    font-size: 1.5rem;
+    animation: pulse-glow 2s ease-in-out infinite;
+}
+
+@keyframes pulse-glow {
+    0%, 100% { text-shadow: var(--glow-cyan); }
+    50% { text-shadow: 0 0 30px rgba(0, 255, 213, 0.8); }
+}
+
+.logo-text {
+    color: var(--text-secondary);
+}
+
+.logo-text .accent {
+    color: var(--accent-cyan);
+}
+
+.system-tag {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    padding: var(--gap-xs) var(--gap-sm);
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-dim);
+    letter-spacing: 0.1em;
+}
+
+.header-center {
+    display: flex;
+    align-items: center;
+    gap: var(--gap-lg);
+}
+
+.live-indicator {
+    display: flex;
+    align-items: center;
+    gap: var(--gap-xs);
+}
+
+.pulse {
+    width: 8px;
+    height: 8px;
+    background: var(--accent-cyan);
+    border-radius: 50%;
+    animation: pulse-dot 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse-dot {
+    0%, 100% {
+        opacity: 1;
+        box-shadow: 0 0 0 0 rgba(0, 255, 213, 0.7);
+    }
+    50% {
+        opacity: 0.7;
+        box-shadow: 0 0 0 6px rgba(0, 255, 213, 0);
+    }
+}
+
+.live-text {
+    font-family: var(--font-display);
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    color: var(--accent-cyan);
+}
+
+.timestamp {
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    letter-spacing: 0.05em;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+}
+
+.connection-status {
+    display: flex;
+    align-items: center;
+    gap: var(--gap-xs);
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    letter-spacing: 0.1em;
+}
+
+.status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+}
+
+.status-dot.connected {
+    background: var(--accent-cyan);
+    box-shadow: var(--glow-cyan);
+}
+
+.status-dot.disconnected {
+    background: var(--accent-magenta);
+}
+
+/* ============================================================================
+   DASHBOARD GRID
+   ============================================================================ */
+
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    grid-template-rows: auto 1fr;
+    gap: var(--gap-md);
+    flex: 1;
+}
+
+/* Panel positions */
+.panel-chart {
+    grid-column: 1;
+    grid-row: 1 / 3;
+}
+
+.panel-price {
+    grid-column: 2;
+    grid-row: 1;
+}
+
+.panel-position {
+    grid-column: 3;
+    grid-row: 1;
+}
+
+.panel-orderflow {
+    grid-column: 2;
+    grid-row: 2;
+}
+
+.panel-stats {
+    grid-column: 3;
+    grid-row: 2;
+}
+
+.panel-signals {
+    grid-column: 1 / 4;
+    grid-row: 3;
+    max-height: 200px;
+}
+
+/* ============================================================================
+   PANEL BASE
+   ============================================================================ */
+
+.panel {
+    background: var(--bg-panel);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--panel-radius);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+}
+
+.panel::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        var(--border-accent),
+        transparent
+    );
+    opacity: 0.5;
+}
+
+.panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--gap-sm) var(--gap-md);
+    border-bottom: 1px solid var(--border-dim);
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.panel-title {
+    font-family: var(--font-display);
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    color: var(--text-secondary);
+}
+
+.panel-badges {
+    display: flex;
+    gap: var(--gap-xs);
+}
+
+.badge {
+    font-size: 0.6rem;
+    padding: 2px 6px;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-dim);
+    color: var(--text-muted);
+    letter-spacing: 0.1em;
+}
+
+.badge-va {
+    color: var(--va-poc);
+    border-color: rgba(255, 215, 0, 0.3);
+}
+
+.panel-content {
+    flex: 1;
+    padding: var(--gap-md);
+    display: flex;
+    flex-direction: column;
+}
+
+/* ============================================================================
+   PRICE CHART
+   ============================================================================ */
+
+.chart-container {
+    flex: 1;
+    position: relative;
+    min-height: 300px;
+}
+
+.chart-container canvas {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+.va-legend {
+    display: flex;
+    justify-content: center;
+    gap: var(--gap-xl);
+    padding-top: var(--gap-md);
+    border-top: 1px solid var(--border-dim);
+    margin-top: var(--gap-md);
+}
+
+.va-item {
+    display: flex;
+    align-items: center;
+    gap: var(--gap-sm);
+}
+
+.va-label {
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+}
+
+.va-value {
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.va-vah .va-label { color: var(--va-vah); }
+.va-vah .va-value { color: var(--va-vah); }
+.va-poc .va-label { color: var(--va-poc); }
+.va-poc .va-value { color: var(--va-poc); }
+.va-val .va-label { color: var(--va-val); }
+.va-val .va-value { color: var(--va-val); }
+
+/* ============================================================================
+   PRICE DISPLAY
+   ============================================================================ */
+
+.price-display {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.big-price {
+    font-family: var(--font-display);
+    font-size: 2.2rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: var(--text-primary);
+    text-shadow: 0 0 30px rgba(255, 255, 255, 0.1);
+}
+
+.price-change {
+    display: flex;
+    align-items: center;
+    gap: var(--gap-xs);
+    margin-top: var(--gap-sm);
+    font-size: 0.9rem;
+}
+
+.price-change.up {
+    color: var(--long);
+}
+
+.price-change.down {
+    color: var(--short);
+}
+
+.price-change.down .change-arrow {
+    transform: rotate(180deg);
+}
+
+/* ============================================================================
+   POSITION DISPLAY
+   ============================================================================ */
+
+.position-display {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.no-position {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--gap-sm);
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+}
+
+.no-position-icon {
+    font-size: 2rem;
+    opacity: 0.3;
+}
+
+.position-active {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-sm);
+}
+
+.position-side {
+    font-family: var(--font-display);
+    font-size: 1.1rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-align: center;
+    padding: var(--gap-sm);
+    border-radius: var(--panel-radius);
+}
+
+.position-side.long {
+    background: var(--long-bg);
+    color: var(--long);
+    border: 1px solid rgba(0, 255, 213, 0.3);
+}
+
+.position-side.short {
+    background: var(--short-bg);
+    color: var(--short);
+    border: 1px solid rgba(255, 61, 127, 0.3);
+}
+
+.position-details {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--gap-xs);
+    font-size: 0.75rem;
+}
+
+.position-detail {
+    display: flex;
+    justify-content: space-between;
+    padding: var(--gap-xs) 0;
+    border-bottom: 1px solid var(--border-dim);
+}
+
+.position-detail-label {
+    color: var(--text-muted);
+}
+
+.position-pnl {
+    grid-column: 1 / 3;
+    text-align: center;
+    padding: var(--gap-sm);
+    margin-top: var(--gap-sm);
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.position-pnl.profit {
+    color: var(--profit);
+    background: var(--long-bg);
+}
+
+.position-pnl.loss {
+    color: var(--loss);
+    background: var(--short-bg);
+}
+
+/* ============================================================================
+   ORDER FLOW
+   ============================================================================ */
+
+.of-meter {
+    position: relative;
+    height: 40px;
+    margin-bottom: var(--gap-md);
+}
+
+.of-bar-container {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 12px;
+    transform: translateY(-50%);
+    display: flex;
+    background: var(--bg-elevated);
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.of-bar {
+    height: 100%;
+    transition: width 0.3s ease;
+}
+
+.of-bar-buy {
+    background: linear-gradient(90deg, transparent, var(--long));
+    width: 50%;
+}
+
+.of-bar-sell {
+    background: linear-gradient(90deg, var(--short), transparent);
+    width: 50%;
+}
+
+.of-center-line {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 2px;
+    height: 24px;
+    background: var(--text-muted);
+    transform: translate(-50%, -50%);
+}
+
+.of-values {
+    display: flex;
+    justify-content: space-between;
+}
+
+.of-value {
+    text-align: center;
+}
+
+.of-label {
+    display: block;
+    font-size: 0.6rem;
+    letter-spacing: 0.15em;
+    color: var(--text-muted);
+    margin-bottom: 2px;
+}
+
+.of-number {
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.of-buy .of-number { color: var(--long); }
+.of-sell .of-number { color: var(--short); }
+.of-delta .of-number { color: var(--text-primary); }
+
+/* ============================================================================
+   STATS
+   ============================================================================ */
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--gap-md);
+}
+
+.stat-item {
+    text-align: center;
+    padding: var(--gap-sm);
+    background: var(--bg-elevated);
+    border-radius: var(--panel-radius);
+}
+
+.stat-label {
+    display: block;
+    font-size: 0.6rem;
+    letter-spacing: 0.15em;
+    color: var(--text-muted);
+    margin-bottom: var(--gap-xs);
+}
+
+.stat-value {
+    font-family: var(--font-display);
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.stat-value.profit { color: var(--profit); }
+.stat-value.loss { color: var(--loss); }
+
+/* ============================================================================
+   SIGNALS
+   ============================================================================ */
+
+.signals-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-xs);
+    overflow-y: auto;
+    max-height: 140px;
+}
+
+.signal-empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 60px;
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+}
+
+.signal-item {
+    display: flex;
+    align-items: center;
+    gap: var(--gap-md);
+    padding: var(--gap-sm) var(--gap-md);
+    background: var(--bg-elevated);
+    border-left: 2px solid var(--text-muted);
+    animation: slide-in 0.3s ease;
+}
+
+@keyframes slide-in {
+    from {
+        opacity: 0;
+        transform: translateX(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.signal-item.long {
+    border-left-color: var(--long);
+    background: var(--long-bg);
+}
+
+.signal-item.short {
+    border-left-color: var(--short);
+    background: var(--short-bg);
+}
+
+.signal-time {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    min-width: 70px;
+}
+
+.signal-type {
+    font-family: var(--font-display);
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    min-width: 140px;
+}
+
+.signal-item.long .signal-type { color: var(--long); }
+.signal-item.short .signal-type { color: var(--short); }
+
+.signal-price {
+    font-size: 0.8rem;
+    min-width: 100px;
+}
+
+.signal-reason {
+    font-size: 0.7rem;
+    color: var(--text-secondary);
+    flex: 1;
+}
+
+/* ============================================================================
+   FOOTER
+   ============================================================================ */
+
+.terminal-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--gap-sm) var(--gap-md);
+    margin-top: var(--gap-md);
+    border-top: 1px solid var(--border-dim);
+}
+
+.footer-left {
+    display: flex;
+    align-items: center;
+    gap: var(--gap-sm);
+}
+
+.footer-tag {
+    font-size: 0.6rem;
+    color: var(--text-muted);
+    letter-spacing: 0.15em;
+}
+
+.footer-divider {
+    color: var(--text-dim);
+}
+
+.footer-version {
+    font-size: 0.6rem;
+    color: var(--text-dim);
+}
+
+/* ============================================================================
+   SCROLLBAR
+   ============================================================================ */
+
+::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-deep);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--border-subtle);
+    border-radius: 2px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--text-muted);
+}
+
+/* ============================================================================
+   RESPONSIVE
+   ============================================================================ */
+
+@media (max-width: 1400px) {
+    .dashboard-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .panel-chart {
+        grid-column: 1 / 3;
+        grid-row: 1;
+    }
+
+    .panel-price {
+        grid-column: 1;
+        grid-row: 2;
+    }
+
+    .panel-position {
+        grid-column: 2;
+        grid-row: 2;
+    }
+
+    .panel-orderflow {
+        grid-column: 1;
+        grid-row: 3;
+    }
+
+    .panel-stats {
+        grid-column: 2;
+        grid-row: 3;
+    }
+
+    .panel-signals {
+        grid-column: 1 / 3;
+        grid-row: 4;
+    }
+}
+
+@media (max-width: 768px) {
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .panel-chart,
+    .panel-price,
+    .panel-position,
+    .panel-orderflow,
+    .panel-stats,
+    .panel-signals {
+        grid-column: 1;
+    }
+
+    .terminal-header {
+        flex-direction: column;
+        gap: var(--gap-md);
+    }
+
+    .big-price {
+        font-size: 1.6rem;
+    }
+}

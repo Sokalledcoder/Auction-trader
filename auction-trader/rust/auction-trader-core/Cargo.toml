@@ -1,0 +1,54 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/core",
+    "crates/ingestion",
+    "crates/features",
+    "crates/backtest",
+    "crates/pyo3_bindings",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+repository = "https://github.com/user/auction-trader"
+
+[workspace.dependencies]
+# Serialization
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+# Async runtime
+tokio = { version = "1.0", features = ["full"] }
+
+# Error handling
+thiserror = "1.0"
+anyhow = "1.0"
+
+# Logging
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+# Time handling
+chrono = { version = "0.4", features = ["serde"] }
+
+# Numeric
+ordered-float = { version = "4.0", features = ["serde"] }
+statrs = "0.17"
+
+# Database
+duckdb = { version = "1.0", features = ["bundled"] }
+rusqlite = { version = "0.32", features = ["bundled"] }
+
+# Python bindings
+pyo3 = { version = "0.22", features = ["extension-module"] }
+
+# Testing
+approx = "0.5"
+
+# Internal crates
+auction-core = { path = "crates/core" }
+auction-ingestion = { path = "crates/ingestion" }
+auction-features = { path = "crates/features" }
+auction-backtest = { path = "crates/backtest" }
